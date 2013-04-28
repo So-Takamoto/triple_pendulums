@@ -31,9 +31,9 @@ namespace pendulums{
 		theta[0] = 3.0;
 		theta[1] = 3.5;
 		theta[2] = 1.5;
-		dtheta[0] = 1.0;
-		dtheta[1] = 1.5;
-		dtheta[2] = -5.0;
+		dtheta[0] = 0.8;
+		dtheta[1] = 0.5;
+		dtheta[2] = -9.0;
 	}
 	void pendState::addDiff(const pendState p, const pendStateDiff pd, double r){
 		for(int i = 0; i < 3; i++){

@@ -7,12 +7,14 @@
 #pragma comment( lib, "freeglut.lib" )
 
 #include "pendulums.h"
+#include "bitmapUtil.h"
 
 const int Windowsize = 600;
-const int PointNum = 1000;
+const int PointNum = 500;
 pendulums::pendClass pend;
 std::deque<std::vector<std::pair<double,double> > > locus;
 bool showLocus = true;
+char windowPixels[3*Windowsize*Windowsize];
 
 void locusAdd(){
 	locus.push_front(pend.vertices());
@@ -23,14 +25,26 @@ void locusAdd(){
 
 void timertick(int value)
 {
+	static int tickCount = 0;
 	const int repeat = 10;
-	const int sleepms = 16;
+	const int sleepms = 30;
+	const double speedup = 1;
 	for(int i = 0; i < repeat; i++){
-		pend.move(sleepms / 1000.0 / static_cast<double>(repeat));
+		pend.move(sleepms / 1000.0 / static_cast<double>(repeat) * speedup);
 		locusAdd();
 	}
     glutPostRedisplay();
     glutTimerFunc(sleepms, timertick, 0);
+
+	//glReadPixels(0, 0, Windowsize, Windowsize, GL_BGR_EXT, GL_UNSIGNED_BYTE, windowPixels);
+	//std::stringstream ss;
+	//ss << "bmp/case3/case_" << std::setw(10) << std::setfill('0') << tickCount << ".bmp";
+	//saveBMP(ss.str(), Windowsize, Windowsize, windowPixels);
+
+	tickCount++;
+	if(tickCount > 7000){
+		exit(0);
+	}
 }
 
 
@@ -89,20 +103,21 @@ void display(void)
 
 	if(showLocus){
 		glPointSize(1.0f);
-		glBegin(GL_POINTS);
-		int pCount = 0;
-		for(auto it = locus.begin(); it != locus.end(); ++it){
-			for(int i = 0; i < 3; i++){
-				float colorMul = 1.0f - static_cast<float>(static_cast<double>(pCount)/static_cast<double>(locus.size()));
+		glLineWidth(1.0f);
+		for(int i = 0; i < 3; i++){
+			glBegin(GL_LINE_STRIP);
+			int pCount = 0;
+			for(auto it = locus.rbegin(); it != locus.rend(); ++it){
+				float colorMul = static_cast<float>(static_cast<double>(pCount)/static_cast<double>(locus.size()));
 				glColor3f(colors[i][0]*colorMul, colors[i][1]*colorMul, colors[i][2]*colorMul);
 				glVertex2d(it->at(i+1).first, it->at(i+1).second);
+				pCount++;
 			}
-			pCount++;
+			glEnd();
 		}
-		glEnd();
 	}
-	glLineWidth(4.0f);
-	glPointSize(6.0f);
+	glLineWidth(3.0f);
+	glPointSize(5.0f);
 	glColor3f(1.000f, 0.498f, 0.000f);
 	for(int i = 0; i < 3; i++){
 		glBegin(GL_LINES);
@@ -122,6 +137,7 @@ void display(void)
 	glutSwapBuffers();
 }
 int main(int argc, char** argv){
+	pend.setIntegrate(3);
 	locusAdd();
 
     glutInitWindowPosition(100, 100);

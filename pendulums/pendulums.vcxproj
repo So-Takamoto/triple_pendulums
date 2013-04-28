@@ -110,6 +110,7 @@
     <ClCompile Include="gl_display.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bitmapUtil.h" />
     <ClInclude Include="pendulums.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
